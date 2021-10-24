@@ -1,6 +1,8 @@
 
 const df = require("date-fns")
-
+function isAlpha(str) {
+        return /^[A-Za-z]+$/.test(str);
+      }
 module.exports= class moment{
 
   constructor(date=new Date(),format){
@@ -8,9 +10,87 @@ module.exports= class moment{
         if(!format){
           this.date = date;
         }
-        else
-          this.date = df.parse(date,format,new Date())
+        else{
+          if(date.length<format.length){
+            let s = "";
+            var frm = "";
+            for(var i=date.length;i<format.length;i+=1){
+              if(isAlpha(format.charAt(i))){
+                frm+=format.charAt(i)
+              }
+              else{
 
+                if(frm)
+                  switch(frm){
+                    case "hh":
+                      s+="12"
+                      break;
+                    case "mm":
+                      s+="00"
+                      break;
+                    case "ss":
+                      s+="00"
+                      break;
+                    case "a":
+                      s+="AM";
+                      break;
+
+                    case "MM":
+                      s+="01"
+                      break;
+                    case "dd":
+                      s+="01"
+                      break;
+                    case "yyyy":
+                      s+=(new Date).getFullYear();
+                      break;
+
+                    default:
+                      s+="0"
+                    break;
+                  }
+
+                frm = "";
+
+                s+=format.charAt(i);
+              }
+            }
+            if(frm)
+              switch(frm){
+                case "hh":
+                  s+="12"
+                  break;
+                case "mm":
+                  s+="00"
+                  break;
+                case "ss":
+                  s+="00"
+                  break;
+                case "a":
+                  s+="AM";
+                  break;
+
+                case "MM":
+                  s+="01"
+                  break;
+                case "dd":
+                  s+="01"
+                  break;
+                case "yyyy":
+                  s+=(new Date).getFullYear();
+                  break;
+
+                default:
+                  s+="0"
+                break;
+              }
+
+            date+=s;
+            console.log(date);
+            console.log(format)
+          }
+          this.date = df.parse(date,format/*.substring(0,date.length)*/,new Date())
+        }
         var mmnt = this;
 
         //"MM/dd/yyyy hh:mm:ss a"
@@ -102,11 +182,13 @@ module.exports= class moment{
         }
         this.diff = function(m,interval){
           interval = parseInterval(interval)
+          //console.log(interval)
           /*if(interval.charAt(interval.length-1)!="s"){
             interval+="s";
           }*/
           interval = interval.charAt(0).toUpperCase() + interval.substring(1,interval.length);
-          return df["differenceIn"+interval](mmnt.date,m.date)
+          var diff = df["differenceIn"+interval](mmnt.date,m.date);
+          return diff
         }
 
         this.valueOf = function(){
