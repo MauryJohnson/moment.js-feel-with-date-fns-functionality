@@ -1,6 +1,7 @@
+
 const df = require("date-fns")
 
-class moment{
+module.exports= class moment{
 
   constructor(date=new Date(),format){
 
@@ -25,6 +26,26 @@ class moment{
           return mmnt.date;
         }
 
+        let parseInterval = function(interval){
+          return {
+            "m":"minutes",
+            "h":"hours",
+            "d":"days",
+            "w":"weeks",
+            "M":"months",
+
+            "minute":"minutes",
+            "minutes":"minutes",
+            "hour":"hours",
+            "hours":"hours",
+            "day":"days",
+            "days":"days",
+            "week":"weeks",
+            "month":"months",
+
+          }[interval]
+        }
+
         /*
         {
           years: 2,
@@ -37,15 +58,33 @@ class moment{
         }
         */
         this.add=function(duration,interval){
-
+          interval = parseInterval(interval)
+          /*
           if(interval.charAt(interval.length-1)!="s"){
             interval+="s";
           }
-
+          */
           mmnt.date = df.add(mmnt.date, {
             [interval]:duration
           })
 
+          return mmnt;
+        }
+
+        this.subtract=function(duration,interval){
+          interval = parseInterval(interval)
+          /*if(interval.charAt(interval.length-1)!="s"){
+            interval+="s";
+          }*/
+
+          mmnt.date = df.sub(mmnt.date, {
+            [interval]:duration
+          })
+
+          return mmnt;
+        }
+
+        this.utc = function(){
           return mmnt;
         }
 
@@ -62,9 +101,10 @@ class moment{
           return df.isBefore(mmnt.date,m) || df.isEqual(mmnt.date,m)
         }
         this.diff = function(m,interval){
-          if(interval.charAt(interval.length-1)!="s"){
+          interval = parseInterval(interval)
+          /*if(interval.charAt(interval.length-1)!="s"){
             interval+="s";
-          }
+          }*/
           interval = interval.charAt(0).toUpperCase() + interval.substring(1,interval.length);
           return df["differenceIn"+interval](mmnt.date,m.date)
         }
